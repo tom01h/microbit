@@ -1,8 +1,7 @@
 # micro:bit で遊ぶ
 
 ## 開発環境
-[yotta](http://docs.yottabuild.org/) を使っています。インストールは [ここ](https://w
-ww.iot-programmer.com/index.php/books/27-micro-bit-iot-in-c/chapters-micro-bit-iot-in-c/44-offline-c-c-development-with-the-micro-bit)を参考にしました。
+[yotta](http://docs.yottabuild.org/) を使っています。インストールは [ここ](https://www.iot-programmer.com/index.php/books/27-micro-bit-iot-in-c/chapters-micro-bit-iot-in-c/44-offline-c-c-development-with-the-micro-bit)を参考にしました。
 
 インストールが出来たら下のような感じにプロジェクトを作成します。
 

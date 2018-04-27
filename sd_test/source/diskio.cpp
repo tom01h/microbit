@@ -166,6 +166,36 @@ int read(uint8_t *buffer, uint32_t length) {
   return 0;
 }
 
+int write(const uint8_t*buffer, uint32_t length) {
+  cs.setDigitalValue(0);
+
+  // indicate start of block
+  spi.write(0xFE);
+
+  // write the data
+  for (uint32_t i = 0; i < length; i++) {
+    spi.write(buffer[i]);
+  }
+
+  // write the checksum
+  spi.write(0xFF);
+  spi.write(0xFF);
+
+  // check the response token
+  if ((spi.write(0xFF) & 0x1F) != 0x05) {
+    cs.setDigitalValue(1);
+    spi.write(0xFF);
+    return 1;
+  }
+
+  // wait for write to finish
+  while (spi.write(0xFF) == 0);
+
+  cs.setDigitalValue(1);
+  spi.write(0xFF);
+  return 0;
+}
+
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
 /*-----------------------------------------------------------------------*/
@@ -233,16 +263,18 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {
-  //TEMP//TEMP// unused parameter 'count'
+  for (uint32_t b = sector; b < sector + count; b++) {
+    // set read address for single block (CMD17)
+    if (cmd(17, b) != 0) {
+      uBit.serial.printf("CMD17 ERROR!! sector = %d\r\n",sector);
+      return RES_ERROR;
+    }
 
-  // set read address for single block (CMD17)
-  if (cmd(17, sector) != 0) {
-    uBit.serial.printf("CMD17 ERROR!! sector = %d\r\n",sector);
-    return RES_ERROR;
+    // receive the data
+    read(buff, 512);
+    buff += 512;
   }
 
-  // receive the data
-  read(buff, 512);
   return RES_OK;
 }
 
@@ -259,7 +291,18 @@ DRESULT disk_write (
 	UINT count			/* Number of sectors to write */
 )
 {
-	return RES_PARERR;
+  for (uint32_t b = sector; b < sector + count; b++) {
+    // set write address for single block (CMD24)
+    if (cmd(24, b) != 0) {
+      return RES_ERROR;
+    }
+
+    // send the data block
+    write(buff, 512);
+    buff += 512;
+  }
+
+  return RES_OK;
 }
 
 
@@ -274,7 +317,7 @@ DRESULT disk_ioctl (
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-	return RES_PARERR;
+  return RES_OK;
 }
 
 DWORD get_fattime (

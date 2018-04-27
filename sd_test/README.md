@@ -6,7 +6,8 @@ SPI の制御は[ここ](https://os.mbed.com/users/mbed_official/code/SDFileSyst
 
 ## テスト内容
 SD カード内の```def.h```の内容を16進数でシリアルポートに出力します。  
-今はまだ、読み出ししかできません。
+SD カードに```WORDL.TXT```を作成し"micro:bit world!!\n"を書き出します。  
+SD カード内の```hello.txt```の内容を4桁の10進数に変換してシリアルポートとディスプレイに出力します。  
 
 ## 実行法
 下のコマンドを打ってプロジェクトを作成します。

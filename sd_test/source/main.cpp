@@ -48,6 +48,22 @@ int main() {
         uBit.serial.printf("f_read error %02x\r\n",Res);
   }
 
+  f_close(&fil);
+
+  f_open(&fil, "world.txt", FA_WRITE|FA_OPEN_ALWAYS);
+  f_write(&fil, "micro:bit world!!\n", 18, &NumBytesRead);
+  uBit.serial.printf("%d\r\n",NumBytesRead);
+  f_close(&fil);
+
+  f_open(&fil, "hello.txt", FA_READ);
+  f_read(&fil, buff, FileSize, &NumBytesRead);
+  buff[NumBytesRead]=0;
+  uBit.serial.printf("%s\r\n",buff);
+  int i=(buff[0]-'0')*1000+(buff[1]-'0')*100+(buff[2]-'0')*10+(buff[3]-'0');
+  uBit.serial.printf("%d\r\n",i);
+  uBit.display.scroll(i,100);
+  f_close(&fil);
+
   uBit.serial.printf("Fin!!\r\n");
 
   release_fiber();

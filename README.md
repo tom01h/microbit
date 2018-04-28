@@ -37,3 +37,7 @@ yotta_modules/microbit-dal/inc/core/MicroBitConfig.h の中で、
 ## SD カードのテスト
 sd_test/ 以下にあります。  
 SPI 機能を使って SD カードにアクセスします。
+
+## 無線接続のデータロガー
+control/ と sensor/ 以下にあります。  
+コントローラ用 micro:bit とセンサー用 micro:bit の間で無線通信を通してセンサーデータを収集し、コントローラ用 micro:bit につないだ SD カード(予定)にログを残します。

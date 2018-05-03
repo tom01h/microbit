@@ -6,6 +6,7 @@
 MicroBit uBit;
 SPI spi(MOSI, MISO, SCK);
 MicroBitPin cs(MICROBIT_ID_IO_P16, MICROBIT_PIN_P16, PIN_CAPABILITY_DIGITAL);
+MicroBitPin miso(MISO, MICROBIT_PIN_P14, PIN_CAPABILITY_DIGITAL);
 DSTATUS sd_init=STA_NOINIT;
 
 MicroBitImage BS("\
@@ -71,8 +72,6 @@ void onData(MicroBitEvent)
 
 }
 
-//  unsigned char buff[512];
-//  UINT FileSize = 512;
 TCHAR *Path = "0:/";
 FIL fil;
 FATFS fatfs;
@@ -88,16 +87,16 @@ void onButtonA(MicroBitEvent)
 
   f_mount(&fatfs, Path, 0);
   res = f_opendir(&dir, "/");
-  if(res != FR_OK){uBit.serial.printf("open dir error\r\n");}
+  if(res != FR_OK){uBit.serial.printf("open dir error\r\n");return;}
 
   int i = 0;
   while(1){
     res = f_readdir(&dir, &fno);
-    if(res != FR_OK){uBit.serial.printf("read dir error\r\n");}
-    if (res != FR_OK || fno.fname[0] == 0) break;
-    if (fno.fname[0] == '.') continue;   // ドットエントリを無視
+    if(res != FR_OK){uBit.serial.printf("read dir error\r\n");return;}
+    if(fno.fname[0] == 0) break;
+    if(fno.fname[0] == '.') continue;   // ドットエントリを無視
     fn = fno.fname;
-    if(!(fno.fattrib & AM_DIR)){         // ディレクトリを無視
+    if(!(fno.fattrib & AM_DIR)){        // ディレクトリを無視
       if(fn[0]!='M') continue;
       if(fn[1]!='B') continue;
       if(fn[2]<'0' || fn[2]>'9') continue;
@@ -148,6 +147,8 @@ int main()
   uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButtonA);
   uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, onButtonAB);
   uBit.radio.enable();
+
+  miso.getDigitalValue(PullUp);
 
   PacketBuffer b(1);
   b[0] = ID*4;
